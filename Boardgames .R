@@ -175,6 +175,20 @@ ggplot(data %>% filter(Users.Rated >= 10), aes(x = Users.Rated, y = Rating.Avera
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
                                             labels = trans_format("log10", math_format(10^.x)),
                                             limits = c(10^2,10^5)) 
+
+quantile(data$Users.Rated, probs = seq(0, 1, 0.25), na.rm = FALSE,
+         names = TRUE, type = 7)
+
+data %>%
+  mutate(category=cut(Users.Rated, breaks=c(-Inf, 55, 120, 385, Inf), labels=c("Low","Middle","High", "Very High"))) %>%
+  group_by(category) %>%
+  summarise(Rating = mean(Rating.Average)) %>%
+  ggplot(aes(x=category, y = Rating)) +
+  geom_bar(stat = "identity", fill = 'lightsteelblue3') +
+  xlab('Number of Ratings') +
+  ylab('Average Rating') +
+  geom_text(aes(label=round(Rating, 2)))
+
 #Average Rating & Owned by Users 
 
 ggplot(data %>% filter(Users.Rated >= 10), aes(x = Owned.Users, y = Rating.Average)) +
@@ -195,14 +209,41 @@ ggplot(data %>% filter(Users.Rated >= 10, Complexity.Average !=0 ),
   ylab("Average Rating") +
   xlab("Complexity Average")
 
-#Average rating by play time !problem!
+quantile(data$Complexity.Average, probs = seq(0, 1, 0.25), na.rm = FALSE,
+         names = TRUE, type = 7)
 
-ggplot(games_by_mech_dom %>% filter(Users.Rated >= 10, Play.Time <= 300), 
+data %>%
+  mutate(category=cut(Complexity.Average, breaks=c(-Inf, 1.33, 1.97, 2.54, Inf), labels=c("Low","Middle","High", "Very High"))) %>%
+  group_by(category) %>%
+  summarise(Rating = mean(Rating.Average)) %>%
+  ggplot(aes(x=category, y = Rating)) +
+  geom_bar(stat = "identity", fill = 'lightsteelblue3') +
+  xlab('Complexity Average') +
+  ylab('Average Rating') +
+  geom_text(aes(label=round(Rating, 2)))
+
+#Average rating by play time
+
+ggplot(data %>% filter(Users.Rated >= 10, Play.Time <= 300), 
        aes(x = Play.Time, y = Rating.Average)) + 
   geom_point(alpha=.2, lwd=.2, col="deeppink") +
   geom_smooth(col="blue", lwd=.7) +
   ylab("Average Rating") +
   xlab("Play Time (min)")
+
+quantile(data$Play.Time, probs = seq(0, 1, 0.25), na.rm = FALSE,
+         names = TRUE, type = 7)
+
+data %>%
+  mutate(category=cut(Play.Time, breaks=c(-Inf, 30, 45, 90, Inf), labels=c("0-30","30-45","45-90", "over 90"))) %>%
+  group_by(category) %>%
+  summarise(Rating = mean(Rating.Average)) %>%
+  ggplot(aes(x=category, y = Rating)) +
+  geom_bar(stat = "identity", fill = 'lightsteelblue3') +
+  xlab('Play Time (min)') +
+  ylab('Average Rating') +
+  geom_text(aes(label=round(Rating, 2)))
+
 
 #Average Rating & number of players
 
@@ -233,7 +274,9 @@ games_by_mech_dom %>%
   group_by(Domains) %>%
   ggplot(aes(x=Domains, y = Rating.Average, fill = Domains)) +
   geom_boxplot() +
-  coord_flip()
+  coord_flip() +
+  ylab('Average Rating') +
+  theme(legend.position = "none")
 
 #Average Rating & mechanics
 
