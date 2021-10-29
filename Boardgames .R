@@ -53,7 +53,7 @@ View(data.by.years)
 
 ggplot(data.by.years,aes(Year.Published,count)) +
   geom_line(col="blue", lwd=1) +
-  ggtitle(paste('Board Games released by Year, ', min(data.by.years$Year.Published),'-', max(data.by.years$Year.Published))) +
+  ggtitle(paste('Board Games Released by Year, ', min(data.by.years$Year.Published),'-', max(data.by.years$Year.Published))) +
   xlab('Year') +
   ylab("Number of Games") +
   ylim(c(0,max(data.by.years$count)))
@@ -69,14 +69,14 @@ ggplot(data %>%
   geom_histogram(aes(y = ..density..), binwidth = .1, fill="red", alpha=.2, col="deeppink") + geom_density(col="red", lwd=1) +
   xlim(0,300) +
   xlab('Play Time (min)') +
-  geom_vline(xintercept=mean(data$Play.Time, na.rm=TRUE), color="black")
+  geom_vline(xintercept=mean(data$Play.Time, na.rm=TRUE), color="black") #This figure is no good. 
 
 #by domains
 
 games_by_mech_dom %>%
   group_by(Domains) %>%
   ggplot(aes(x=Domains)) +
-  geom_bar(fill="steelblue") +
+  geom_bar(fill='lightsteelblue3') +
   coord_flip() +
   ylab('Number of Games')
 
@@ -88,7 +88,10 @@ games_by_mech_dom_20 = games_by_mech_dom %>%
   summarise(count = n()) %>%
   top_n(20)  
 
-ggplot(data=games_by_mech_dom_20, aes(x=Mechanics, y=count)) + geom_bar(stat="identity", width=0.5, fill="steelblue") + coord_flip()
+ggplot(data=games_by_mech_dom_20, aes(x=Mechanics, y=count)) + 
+  geom_bar(stat="identity", width=0.5, fill="steelblue") + 
+  coord_flip() +
+  ylab('Number of Games')
 
 #by rating 
 
@@ -98,13 +101,15 @@ data %>% summarise(Mean = mean(Rating.Average)) # 6.403227
 ggplot(data, aes(x = Rating.Average)) +
   geom_histogram(aes(y = ..density..), binwidth = .1, fill="red", alpha=.2, col="deeppink") + geom_density(col="red", lwd=1) +
   xlim(0,10) +
-  xlab('Avg. Rating') +
+  xlab('Average Rating') +
+  ylab('Density') +
   geom_vline(xintercept=mean(data$Rating.Average, na.rm=TRUE), color="black")
+
 
 #by complexity 
 data %>% summarise(Mean = mean(Complexity.Average), max(Complexity.Average), min(Complexity.Average)) #1.991188 scale: 0-5
 
-ggplot(data, aes(x = Complexity.Average)) +
+ggplot(data %>% filter(Complexity.Average !=0), aes(x = Complexity.Average)) +
   geom_histogram(aes(y = ..density..), binwidth = .1, fill="red", alpha=.2, col="deeppink") + geom_density(col="red", lwd=1) +
   xlim(0,10) +
   xlab('Complexity Average') +
@@ -124,7 +129,7 @@ data %>%
   group_by(Min.Players) %>%
   filter(Min.Players != 0, Min.Players <=7 ) %>%
   ggplot(aes(x=Min.Players)) + 
-  geom_bar(fill="steelblue") + 
+  geom_bar(fill='lightsteelblue3') + 
   scale_x_continuous(breaks = c(1:7)) + 
   ylab("Number of Games") +
   xlab("Min Number of Players") + 
@@ -142,7 +147,7 @@ data %>%
   group_by(Max.Players) %>%
   filter(Max.Players != 0, Max.Players <= 10) %>%
   ggplot(aes(x=Max.Players)) + 
-  geom_bar(fill="steelblue") + 
+  geom_bar(fill='lightsteelblue3') + 
   scale_x_continuous(breaks = c(1:10)) + 
   ylab("Number of Games") +
   xlab("Max Number of Players") +
@@ -151,7 +156,14 @@ data %>%
 
 #by play time
 data %>% summarise(Mean = mean(Play.Time), max(Play.Time), min(Play.Time))
-ggplot(data=data, aes(x=Play.Time)) + geom_dotplot()
+
+ggplot(data %>% filter(Play.Time <= 1000), aes(x=Play.Time)) + 
+  geom_histogram(aes(y = ..density..), binwidth = .1, fill="red", alpha=.2, col="deeppink") + 
+  geom_density(col="red", lwd=1) +
+  xlim(0,10000) +
+  xlab('Number of Games') +
+  ylab('Play Time (min)') +
+  geom_vline(xintercept=mean(data$Play.Time, na.rm=TRUE), color="black")
 
 #Average Rating & Number of Ratings
 
